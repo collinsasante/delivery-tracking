@@ -36,8 +36,18 @@ export default function RidersPage() {
       const zonesData = await zonesRes.json();
       const ridersData = await ridersRes.json();
 
-      setZones(zonesData);
-      setRiders(ridersData);
+      setZones(Array.isArray(zonesData) ? zonesData : []);
+      setRiders(Array.isArray(ridersData) ? ridersData : []);
+
+      // Auto-generate next Rider ID
+      if (Array.isArray(ridersData) && ridersData.length > 0) {
+        const lastRider = ridersData[ridersData.length - 1];
+        const lastIdNumber = parseInt(lastRider.riderId.replace(/\D/g, '')) || 0;
+        const nextId = `R-${String(lastIdNumber + 1).padStart(3, '0')}`;
+        setRiderForm(prev => ({ ...prev, riderId: nextId }));
+      } else {
+        setRiderForm(prev => ({ ...prev, riderId: 'R-001' }));
+      }
     } catch (err) {
       setError('Failed to load data');
       console.error(err);
@@ -81,7 +91,7 @@ export default function RidersPage() {
         joinedDate: format(new Date(), 'yyyy-MM-dd'),
       });
 
-      // Reload riders list
+      // Reload riders list and auto-generate new ID
       loadData();
     } catch (err: any) {
       setError(err.message || 'Failed to create rider');
@@ -127,18 +137,17 @@ export default function RidersPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rider ID *
+                  Rider ID * (Auto-generated)
                 </label>
                 <input
                   required
                   type="text"
                   value={riderForm.riderId}
-                  onChange={(e) => setRiderForm({ ...riderForm, riderId: e.target.value })}
-                  placeholder="e.g., R-001"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-not-allowed"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Unique identifier for the rider (e.g., R-001, R-002)
+                  Automatically generated unique identifier
                 </p>
               </div>
 
@@ -152,7 +161,7 @@ export default function RidersPage() {
                   value={riderForm.name}
                   onChange={(e) => setRiderForm({ ...riderForm, name: e.target.value })}
                   placeholder="e.g., John Doe"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -165,7 +174,7 @@ export default function RidersPage() {
                   value={riderForm.phone}
                   onChange={(e) => setRiderForm({ ...riderForm, phone: e.target.value })}
                   placeholder="e.g., +233 123 456 789"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -176,7 +185,7 @@ export default function RidersPage() {
                 <select
                   value={riderForm.zone}
                   onChange={(e) => setRiderForm({ ...riderForm, zone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 >
                   <option value="">Select zone (optional)</option>
                   {zones.map((zone) => (
@@ -198,7 +207,7 @@ export default function RidersPage() {
                   type="date"
                   value={riderForm.joinedDate}
                   onChange={(e) => setRiderForm({ ...riderForm, joinedDate: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 

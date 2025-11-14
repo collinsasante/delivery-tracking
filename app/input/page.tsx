@@ -49,8 +49,8 @@ export default function InputPage() {
         const ridersData = await ridersRes.json();
         const zonesData = await zonesRes.json();
 
-        setRiders(ridersData);
-        setZones(zonesData);
+        setRiders(Array.isArray(ridersData) ? ridersData : []);
+        setZones(Array.isArray(zonesData) ? zonesData : []);
       } catch (err) {
         setError('Failed to load data');
         console.error(err);
@@ -231,7 +231,7 @@ export default function InputPage() {
                     required
                     value={tripForm.rider}
                     onChange={(e) => setTripForm({ ...tripForm, rider: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   >
                     <option value="">Select rider...</option>
                     {riders.map((rider) => (
@@ -249,7 +249,7 @@ export default function InputPage() {
                     type="date"
                     value={tripForm.date}
                     onChange={(e) => setTripForm({ ...tripForm, date: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -260,7 +260,7 @@ export default function InputPage() {
                     value={tripForm.period}
                     onChange={(e) => setTripForm({ ...tripForm, period: e.target.value })}
                     placeholder="e.g., 06/11/2025 – 12/11/2025"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -271,7 +271,7 @@ export default function InputPage() {
                   <select
                     value={tripForm.pickupLocation}
                     onChange={(e) => setTripForm({ ...tripForm, pickupLocation: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   >
                     <option value="">Select zone...</option>
                     {zones.map((zone) => (
@@ -291,7 +291,7 @@ export default function InputPage() {
                     onChange={(e) =>
                       setTripForm({ ...tripForm, deliveryLocation: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   >
                     <option value="">Select zone...</option>
                     {zones.map((zone) => (
@@ -310,7 +310,7 @@ export default function InputPage() {
                     type="datetime-local"
                     value={tripForm.pickupTime}
                     onChange={(e) => setTripForm({ ...tripForm, pickupTime: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -322,7 +322,7 @@ export default function InputPage() {
                     type="datetime-local"
                     value={tripForm.arrivalTime}
                     onChange={(e) => setTripForm({ ...tripForm, arrivalTime: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -336,7 +336,7 @@ export default function InputPage() {
                     onChange={(e) =>
                       setTripForm({ ...tripForm, deliveryTimeRider: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -350,7 +350,7 @@ export default function InputPage() {
                     onChange={(e) =>
                       setTripForm({ ...tripForm, deliveryTimeCustomer: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -364,7 +364,7 @@ export default function InputPage() {
                       step="0.1"
                       value={tripForm.distance}
                       onChange={(e) => setTripForm({ ...tripForm, distance: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-green-50"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-green-50 text-gray-900"
                     />
                     {tripForm.distance && (
                       <span className="absolute right-3 top-2 text-xs text-green-600 font-medium">
@@ -388,7 +388,7 @@ export default function InputPage() {
                       onChange={(e) =>
                         setTripForm({ ...tripForm, expectedDeliveryTime: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-green-50"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-green-50 text-gray-900"
                     />
                     {tripForm.expectedDeliveryTime && (
                       <span className="absolute right-3 top-2 text-xs text-green-600 font-medium">
@@ -423,7 +423,7 @@ export default function InputPage() {
                   value={tripForm.notes}
                   onChange={(e) => setTripForm({ ...tripForm, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                 />
               </div>
 
@@ -446,7 +446,7 @@ export default function InputPage() {
                     required
                     value={dailyForm.rider}
                     onChange={(e) => setDailyForm({ ...dailyForm, rider: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   >
                     <option value="">Select rider...</option>
                     {riders.map((rider) => (
@@ -464,7 +464,7 @@ export default function InputPage() {
                     type="date"
                     value={dailyForm.date}
                     onChange={(e) => setDailyForm({ ...dailyForm, date: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                 </div>
 
@@ -476,7 +476,7 @@ export default function InputPage() {
                     type="time"
                     value={dailyForm.reportingTime}
                     onChange={(e) => setDailyForm({ ...dailyForm, reportingTime: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
                   />
                   <p className="mt-1 text-xs text-gray-500">
                     Punctual if before 8:30 AM

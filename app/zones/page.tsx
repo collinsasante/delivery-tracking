@@ -25,7 +25,7 @@ export default function ZonesPage() {
     try {
       const response = await fetch('/api/zones');
       const data = await response.json();
-      setZones(data);
+      setZones(Array.isArray(data) ? data : []);
     } catch (err) {
       setError('Failed to load zones');
       console.error(err);
@@ -117,7 +117,7 @@ export default function ZonesPage() {
                   value={zoneForm.zoneName}
                   onChange={(e) => setZoneForm({ ...zoneForm, zoneName: e.target.value })}
                   placeholder="e.g., Madina, Kasoa, Accra"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -130,7 +130,7 @@ export default function ZonesPage() {
                   value={zoneForm.coordinates}
                   onChange={(e) => setZoneForm({ ...zoneForm, coordinates: e.target.value })}
                   placeholder="e.g., 5.6037,-0.1870"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
                 <p className="mt-1 text-xs text-gray-500">
                   Format: latitude,longitude (e.g., 5.6037,-0.1870 for Accra)
@@ -150,7 +150,7 @@ export default function ZonesPage() {
                   value={zoneForm.defaultDistance}
                   onChange={(e) => setZoneForm({ ...zoneForm, defaultDistance: e.target.value })}
                   placeholder="e.g., 15"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
                 <p className="mt-1 text-xs text-gray-500">
                   Fallback distance used when coordinates aren't available
