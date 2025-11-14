@@ -1,20 +1,15 @@
 import Airtable from 'airtable';
 
-// Initialize Airtable
-const apiKey = process.env.NEXT_PUBLIC_AIRTABLE_API_KEY || '';
-const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID || '';
-
-// Create a dummy base for build time (will be replaced at runtime)
-const base = apiKey && baseId
-  ? new Airtable({ apiKey }).base(baseId)
-  : new Airtable({ apiKey: 'dummy' }).base('dummy');
-
 // Helper function to get base with runtime validation
 function getBase() {
+  const apiKey = process.env.NEXT_PUBLIC_AIRTABLE_API_KEY;
+  const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID;
+
   if (!apiKey || !baseId) {
     throw new Error('Missing Airtable credentials in environment variables');
   }
-  return base;
+
+  return new Airtable({ apiKey }).base(baseId);
 }
 
 // Table references with lazy initialization
@@ -36,4 +31,5 @@ export const tables = {
   },
 };
 
-export default base;
+// Default export for backwards compatibility
+export default getBase();
