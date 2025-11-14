@@ -1,0 +1,38 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+        env:
+          NEXT_PUBLIC_AIRTABLE_API_KEY: ${{ secrets.NEXT_PUBLIC_AIRTABLE_API_KEY }}
+          NEXT_PUBLIC_AIRTABLE_BASE_ID: ${{ secrets.NEXT_PUBLIC_AIRTABLE_BASE_ID }}
+          NEXT_PUBLIC_AIRTABLE_RIDERS_TABLE: Riders
+          NEXT_PUBLIC_AIRTABLE_ZONES_TABLE: Zones
+          NEXT_PUBLIC_AIRTABLE_TRIPS_TABLE: Trips
+          NEXT_PUBLIC_AIRTABLE_DAILY_SUMMARIES_TABLE: Daily Summaries
+          NEXT_PUBLIC_AIRTABLE_PERIODS_TABLE: Periods / Reports
+
+      - name: Build success
+        run: echo "✅ Build completed successfully!"

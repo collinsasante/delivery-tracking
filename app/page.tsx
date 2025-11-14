@@ -1,65 +1,160 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { format, subDays } from "date-fns";
+import Link from "next/link";
+import RiderSelector from "@/components/RiderSelector";
+import DateRangePicker from "@/components/DateRangePicker";
+import PerformanceReport from "@/components/PerformanceReport";
+import { Rider, PerformanceMetrics } from "@/types";
 
 export default function Home() {
+  const [riders, setRiders] = useState<Rider[]>([]);
+  const [selectedRider, setSelectedRider] = useState("");
+  const [startDate, setStartDate] = useState(
+    format(subDays(new Date(), 7), "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
+  const [riderName, setRiderName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Fetch riders on component mount
+  useEffect(() => {
+    async function loadRiders() {
+      try {
+        const response = await fetch("/api/riders");
+        if (!response.ok) throw new Error("Failed to fetch riders");
+        const data = await response.json();
+        setRiders(data);
+      } catch (err) {
+        setError(
+          "Failed to load riders. Please check your Airtable configuration."
+        );
+        console.error(err);
+      }
+    }
+    loadRiders();
+  }, []);
+
+  // Fetch performance metrics when rider or dates change
+  const fetchPerformance = async () => {
+    if (!selectedRider || !startDate || !endDate) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `/api/riders/${selectedRider}/performance?startDate=${startDate}&endDate=${endDate}`
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch performance data");
+
+      const data = await response.json();
+      setMetrics(data.metrics);
+      setRiderName(data.rider.name);
+    } catch (err) {
+      setError("Failed to load performance data. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Reliability Tracker
+              </h1>
+              <p className="text-gray-600">
+                Track and analyze rider performance metrics over time
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/riders"
+              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              Manage Riders
+            </Link>
+            <Link
+              href="/zones"
+              className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              Manage Zones
+            </Link>
+            <Link
+              href="/input"
+              className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              Add Data
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Controls Card */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <RiderSelector
+            riders={riders}
+            selectedRider={selectedRider}
+            onSelectRider={setSelectedRider}
+          />
+
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+          />
+
+          <button
+            onClick={fetchPerformance}
+            disabled={!selectedRider || loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {loading ? "Loading..." : "Generate Performance Report"}
+          </button>
+
+          {error && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800 text-sm">{error}</p>
+            </div>
+          )}
         </div>
-      </main>
+
+        {/* Performance Report */}
+        {metrics && riderName && (
+          <div className="animate-fadeIn">
+            <PerformanceReport riderName={riderName} metrics={metrics} />
+          </div>
+        )}
+
+        {/* Instructions */}
+        {!metrics && !loading && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+              Getting Started
+            </h3>
+            <ul className="text-blue-800 space-y-2 list-disc list-inside">
+              <li>Select a rider from the dropdown menu</li>
+              <li>Choose a date range for the performance period</li>
+              <li>Click Generate Performance Report to view metrics</li>
+              <li>
+                The system will calculate scores based on punctuality,
+                availability, and delivery performance
+              </li>
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
