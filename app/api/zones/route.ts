@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { fetchZones } from '@/lib/airtable-helpers';
 
+export const runtime = 'edge';
+
 export async function GET() {
   try {
     const zones = await fetchZones();
