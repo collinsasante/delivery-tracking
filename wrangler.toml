@@ -1,0 +1,9 @@
+name = "delivery-tracking"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = ".next"
+
+[env.production]
+name = "delivery-tracking"
+
+[env.preview]
+name = "delivery-tracking-preview"
